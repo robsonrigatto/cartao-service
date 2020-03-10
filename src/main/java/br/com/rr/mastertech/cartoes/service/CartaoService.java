@@ -2,6 +2,7 @@ package br.com.rr.mastertech.cartoes.service;
 
 import br.com.rr.mastertech.cartoes.domain.Cartao;
 import br.com.rr.mastertech.cartoes.domain.Cliente;
+import br.com.rr.mastertech.cartoes.exception.InactivedEntityException;
 import br.com.rr.mastertech.cartoes.repository.CartaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,20 @@ public class CartaoService {
         Cartao entity = optionalCartao.get();
         entity.setAtivo(ativo);
         return cartaoRepository.save(entity);
+    }
+
+    public Cartao findActiveById(Integer id) {
+        Optional<Cartao> optionalCartao = this.cartaoRepository.findById(id);
+        if(!optionalCartao.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        Cartao cartao = optionalCartao.get();
+        if(!cartao.getAtivo()) {
+            throw new InactivedEntityException();
+        }
+
+        return cartao;
     }
 
     public Cartao findById(Integer id) {

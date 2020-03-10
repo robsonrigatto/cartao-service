@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @RestController
@@ -30,8 +32,8 @@ public class CartaoController {
         entity.setNumero(createDTO.getNumero());
 
         Optional<Cliente> optionalCliente = clienteRepository.findById(createDTO.getClienteId());
-        if(!optionalCliente.isPresent()) { //TODO cliente não existe
-            return ResponseEntity.unprocessableEntity().build();
+        if(!optionalCliente.isPresent()) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "é obrigatório informar um cliente existente");
         }
 
         entity.setCliente(optionalCliente.get());
@@ -47,7 +49,7 @@ public class CartaoController {
     public ResponseEntity<CartaoDTO> findByNumero(@PathVariable String numero) {
         Optional<Cartao> optionalCartao = this.cartaoRepository.findByNumero(numero);
         if(!optionalCartao.isPresent()) {
-            return ResponseEntity.notFound().build();
+            throw new EntityNotFoundException();
         }
 
         Cartao entity = optionalCartao.get();
@@ -60,7 +62,7 @@ public class CartaoController {
     public ResponseEntity<CartaoDTO> update(@PathVariable String numero, @RequestBody UpdateCartaoDTO updateDTO) {
         Optional<Cartao> optionalCartao = this.cartaoRepository.findByNumero(numero);
         if(!optionalCartao.isPresent()) {
-            return ResponseEntity.notFound().build();
+            throw new EntityNotFoundException();
         }
 
         Cartao entity = optionalCartao.get();

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,12 +34,12 @@ public class PagamentoController {
     public ResponseEntity<PagamentoDTO> create(@RequestBody CreatePagamentoDTO createDTO) {
         Optional<Cartao> optionalCartao = cartaoRepository.findById(createDTO.getIdCartao());
         if(!optionalCartao.isPresent()) {
-            return ResponseEntity.unprocessableEntity().build();
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "é obrigatório informar um cartão existente");
         }
 
         Cartao cartao = optionalCartao.get();
         if(!cartao.getAtivo()) {
-            return ResponseEntity.unprocessableEntity().build();
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "é obrigatório informar um cartão ativo");
         }
 
         Pagamento entity = Pagamento.builder().descricao(createDTO.getDescricao()).cartao(cartao).valor(createDTO.getValor()).build();
@@ -51,7 +52,7 @@ public class PagamentoController {
     public ResponseEntity<List<PagamentoDTO>> findAllByIdCartao(@PathVariable Integer idCartao) {
         Optional<Cartao> optionalCartao = cartaoRepository.findById(idCartao);
         if(!optionalCartao.isPresent()) {
-            return ResponseEntity.unprocessableEntity().build();
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "é obrigatório informar um cartão existente");
         }
 
         List<Pagamento> entities = pagamentoRepository.findAllByIdCartao(idCartao);

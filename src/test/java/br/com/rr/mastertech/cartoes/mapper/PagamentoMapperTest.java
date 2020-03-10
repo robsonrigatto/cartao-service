@@ -18,7 +18,7 @@ public class PagamentoMapperTest {
 
     @Test
     public void entityToDTOTest() {
-        PagamentoDTO dto = mapper.entityToDTO(Pagamento.builder()
+        PagamentoDTO dto = mapper.toDTO(Pagamento.builder()
                 .id(1).descricao("descricao").valor(10.5)
                 .cartao(Cartao.builder().id(2).build())
                 .build());

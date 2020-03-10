@@ -5,8 +5,9 @@ import br.com.rr.mastertech.cartoes.domain.Cliente;
 import br.com.rr.mastertech.cartoes.dto.request.CreateCartaoDTO;
 import br.com.rr.mastertech.cartoes.dto.request.UpdateCartaoDTO;
 import br.com.rr.mastertech.cartoes.dto.response.CartaoDTO;
-import br.com.rr.mastertech.cartoes.repository.CartaoRepository;
-import br.com.rr.mastertech.cartoes.repository.ClienteRepository;
+import br.com.rr.mastertech.cartoes.mapper.CartaoMapper;
+import br.com.rr.mastertech.cartoes.service.CartaoService;
+import br.com.rr.mastertech.cartoes.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,63 +15,41 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/cartao")
 public class CartaoController {
 
     @Autowired
-    private CartaoRepository cartaoRepository;
+    private CartaoService cartaoService;
 
     @Autowired
-    private ClienteRepository clienteRepository;
+    private CartaoMapper cartaoMapper;
+
+    @Autowired
+    private ClienteService clienteService;
 
     @PostMapping
     public ResponseEntity<CartaoDTO> create(@RequestBody CreateCartaoDTO createDTO) {
-        Cartao entity = new Cartao();
-        entity.setNumero(createDTO.getNumero());
+        try {
+            Cliente cliente = clienteService.findById(createDTO.getClienteId());
+            Cartao entity = cartaoService.create(createDTO.getNumero(), cliente);
+            return new ResponseEntity(cartaoMapper.toDTO(entity), HttpStatus.CREATED);
 
-        Optional<Cliente> optionalCliente = clienteRepository.findById(createDTO.getClienteId());
-        if(!optionalCliente.isPresent()) {
+        } catch (EntityNotFoundException ex) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "é obrigatório informar um cliente existente");
         }
-
-        entity.setCliente(optionalCliente.get());
-        entity.setAtivo(false);
-        entity = this.cartaoRepository.save(entity);
-
-        CartaoDTO dto = CartaoDTO.builder().id(entity.getId()).numero(entity.getNumero())
-                .clienteId(entity.getCliente().getId()).ativo(false).build();
-        return new ResponseEntity(dto, HttpStatus.CREATED);
-    }
-
-    @GetMapping("/{numero}")
-    public ResponseEntity<CartaoDTO> findByNumero(@PathVariable String numero) {
-        Optional<Cartao> optionalCartao = this.cartaoRepository.findByNumero(numero);
-        if(!optionalCartao.isPresent()) {
-            throw new EntityNotFoundException();
-        }
-
-        Cartao entity = optionalCartao.get();
-        CartaoDTO dto = CartaoDTO.builder().id(entity.getId()).numero(entity.getNumero())
-                .clienteId(entity.getCliente().getId()).ativo(entity.getAtivo()).build();
-        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/{numero}")
     public ResponseEntity<CartaoDTO> update(@PathVariable String numero, @RequestBody UpdateCartaoDTO updateDTO) {
-        Optional<Cartao> optionalCartao = this.cartaoRepository.findByNumero(numero);
-        if(!optionalCartao.isPresent()) {
-            throw new EntityNotFoundException();
-        }
+        Cartao entity = cartaoService.update(numero, updateDTO.getAtivo());
+        return ResponseEntity.ok(cartaoMapper.toDTO(entity));
+    }
 
-        Cartao entity = optionalCartao.get();
-        entity.setAtivo(updateDTO.getAtivo());
-        entity = cartaoRepository.save(entity);
-
-        CartaoDTO dto = CartaoDTO.builder().id(entity.getId()).numero(entity.getNumero())
-                .clienteId(entity.getCliente().getId()).ativo(entity.getAtivo()).build();
-        return ResponseEntity.ok(dto);
+    @GetMapping("/{numero}")
+    public ResponseEntity<CartaoDTO> findByNumero(@PathVariable String numero) {
+        Cartao entity = cartaoService.findByNumero(numero);
+        return ResponseEntity.ok(cartaoMapper.toDTO(entity));
     }
 }

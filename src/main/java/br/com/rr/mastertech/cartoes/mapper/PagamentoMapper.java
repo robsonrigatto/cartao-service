@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PagamentoMapper {
 
-    public PagamentoDTO entityToDTO(Pagamento entity) {
+    public PagamentoDTO toDTO(Pagamento entity) {
         return PagamentoDTO.builder()
                 .id(entity.getId()).descricao(entity.getDescricao())
                 .idCartao(entity.getCartao().getId()).valor(entity.getValor())

@@ -3,7 +3,8 @@ package br.com.rr.mastertech.cartoes.controller;
 import br.com.rr.mastertech.cartoes.domain.Cliente;
 import br.com.rr.mastertech.cartoes.dto.request.CreateClienteDTO;
 import br.com.rr.mastertech.cartoes.dto.response.ClienteDTO;
-import br.com.rr.mastertech.cartoes.repository.ClienteRepository;
+import br.com.rr.mastertech.cartoes.mapper.ClienteMapper;
+import br.com.rr.mastertech.cartoes.service.ClienteService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -11,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,22 +25,25 @@ public class ClienteControllerTest {
     private ClienteController controller;
 
     @Mock
-    private ClienteRepository clienteRepository;
+    private ClienteService clienteService;
+
+    @Mock
+    private ClienteMapper clienteMapper;
 
     @Test
     public void findById_notFound() {
-        when(clienteRepository.findById(any())).thenReturn(Optional.empty());
+        when(clienteService.findById(any())).thenThrow(new EntityNotFoundException());
         assertThrows(EntityNotFoundException.class, () -> controller.findById(1));
     }
 
     @Test
     public void findById_found() {
-        when(clienteRepository.findById(1)).thenReturn(Optional.of(Cliente.builder().id(1).name("Robson Rigatto").build()));
+        when(clienteService.findById(1)).thenReturn(Cliente.builder().id(1).name("Robson Rigatto").build());
+        when(clienteMapper.toDTO(any())).thenReturn(new ClienteDTO(1, "Robson Rigatto"));
         ResponseEntity<ClienteDTO> response = controller.findById(1);
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(1, response.getBody().getId());
-//        verify(clienteRepository.save(any()), times(1));
     }
 
     @Test
@@ -48,11 +51,12 @@ public class ClienteControllerTest {
         CreateClienteDTO createDTO = new CreateClienteDTO();
         createDTO.setName("Robson Rigatto");
 
-        when(clienteRepository.save(any())).thenReturn(Cliente.builder().id(5).name("Robson Rigatto").build());
+        when(clienteService.create(any())).thenReturn(Cliente.builder().id(5).name("Robson Rigatto").build());
+        when(clienteMapper.toDTO(any())).thenReturn(new ClienteDTO(5, "Robson Rigatto"));
 
         ResponseEntity<ClienteDTO> response = controller.create(createDTO);
 
-        verify(clienteRepository, times(1)).save(any());
+        verify(clienteService, times(1)).create(any());
         assertEquals(201, response.getStatusCodeValue());
         assertEquals(5, response.getBody().getId());
     }

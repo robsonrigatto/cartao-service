@@ -4,7 +4,6 @@ import br.com.rr.mastertech.cartao.client.ClienteClient;
 import br.com.rr.mastertech.cartao.client.dto.ClienteDTO;
 import br.com.rr.mastertech.cartao.domain.Cartao;
 import br.com.rr.mastertech.cartao.exception.ClienteNaoEncontradoException;
-import br.com.rr.mastertech.cartao.exception.InactivedEntityException;
 import br.com.rr.mastertech.cartao.repository.CartaoRepository;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +41,6 @@ public class CartaoService {
         Cartao entity = optionalCartao.get();
         entity.setAtivo(ativo);
         return cartaoRepository.save(entity);
-    }
-
-    public Cartao findActiveById(Integer id) {
-        Optional<Cartao> optionalCartao = this.cartaoRepository.findById(id);
-        if(!optionalCartao.isPresent()) {
-            throw new EntityNotFoundException();
-        }
-
-        Cartao cartao = optionalCartao.get();
-        if(!cartao.getAtivo()) {
-            throw new InactivedEntityException();
-        }
-
-        return cartao;
     }
 
     public Cartao findById(Integer id) {

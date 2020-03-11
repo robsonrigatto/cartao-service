@@ -1,4 +1,4 @@
-package br.com.rr.mastertech;
+package br.com.rr.mastertech.cartao;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

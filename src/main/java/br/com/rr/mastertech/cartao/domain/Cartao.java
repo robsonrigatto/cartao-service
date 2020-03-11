@@ -1,12 +1,14 @@
 package br.com.rr.mastertech.cartao.domain;
 
-import br.com.rr.mastertech.cliente.domain.Cliente;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @Entity
 @Data
@@ -22,7 +24,6 @@ public class Cartao {
     private String numero;
     private Boolean ativo;
 
-    @ManyToOne
-    @JoinColumn(name = "ID_CLIENTE")
-    private Cliente cliente;
+    @Column(name = "ID_CLIENTE")
+    private Integer clienteId;
 }

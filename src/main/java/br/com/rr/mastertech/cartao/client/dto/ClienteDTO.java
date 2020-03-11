@@ -1,10 +1,8 @@
-package br.com.rr.mastertech.cliente.dto.response;
+package br.com.rr.mastertech.cartao.client.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class ClienteDTO {
 
     private Integer id;

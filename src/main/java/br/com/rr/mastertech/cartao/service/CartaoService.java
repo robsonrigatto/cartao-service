@@ -1,9 +1,12 @@
 package br.com.rr.mastertech.cartao.service;
 
+import br.com.rr.mastertech.cartao.client.ClienteClient;
+import br.com.rr.mastertech.cartao.client.dto.ClienteDTO;
 import br.com.rr.mastertech.cartao.domain.Cartao;
+import br.com.rr.mastertech.cartao.exception.ClienteNaoEncontradoException;
 import br.com.rr.mastertech.cartao.exception.InactivedEntityException;
 import br.com.rr.mastertech.cartao.repository.CartaoRepository;
-import br.com.rr.mastertech.cliente.domain.Cliente;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +19,18 @@ public class CartaoService {
     @Autowired
     private CartaoRepository cartaoRepository;
 
-    public Cartao create(String numero, Cliente cliente) {
-        Cartao cartao = Cartao.builder().numero(numero).cliente(cliente).ativo(false).build();
-        return this.cartaoRepository.save(cartao);
+    @Autowired
+    private ClienteClient clienteClient;
+
+    public Cartao create(String numero, Integer clienteId) {
+        try {
+            ClienteDTO clienteDTO = clienteClient.findById(clienteId);
+            Cartao cartao = Cartao.builder().numero(numero).clienteId(clienteDTO.getId()).ativo(false).build();
+            return this.cartaoRepository.save(cartao);
+
+        } catch (FeignException.FeignClientException.NotFound ex) {
+            throw new ClienteNaoEncontradoException();
+        }
     }
 
     public Cartao update(String numero, Boolean ativo) {

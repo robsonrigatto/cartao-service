@@ -6,8 +6,6 @@ import br.com.rr.mastertech.cartao.dto.request.UpdateCartaoDTO;
 import br.com.rr.mastertech.cartao.dto.response.CartaoDTO;
 import br.com.rr.mastertech.cartao.mapper.CartaoMapper;
 import br.com.rr.mastertech.cartao.service.CartaoService;
-import br.com.rr.mastertech.cliente.domain.Cliente;
-import br.com.rr.mastertech.cliente.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +24,10 @@ public class CartaoController {
     @Autowired
     private CartaoMapper cartaoMapper;
 
-    @Autowired
-    private ClienteService clienteService;
-
     @PostMapping
     public ResponseEntity<CartaoDTO> create(@RequestBody CreateCartaoDTO createDTO) {
         try {
-            Cliente cliente = clienteService.findById(createDTO.getClienteId());
-            Cartao entity = cartaoService.create(createDTO.getNumero(), cliente);
+            Cartao entity = cartaoService.create(createDTO.getNumero(), createDTO.getClienteId());
             return new ResponseEntity(cartaoMapper.toDTO(entity), HttpStatus.CREATED);
 
         } catch (EntityNotFoundException ex) {

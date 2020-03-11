@@ -10,7 +10,7 @@ public class CartaoMapper {
     public CartaoDTO toDTO(Cartao entity) {
         return CartaoDTO.builder().id(entity.getId())
                 .numero(entity.getNumero())
-                .clienteId(entity.getCliente().getId())
+                .clienteId(entity.getClienteId())
                 .ativo(entity.getAtivo()).build();
     }
 }

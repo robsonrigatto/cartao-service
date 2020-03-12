@@ -28,20 +28,26 @@ public class CartaoController {
     }
 
     @PatchMapping("/{numero}")
-    public ResponseEntity<CartaoDTO> update(@PathVariable String numero, @RequestBody UpdateCartaoDTO updateDTO) {
+    public CartaoDTO update(@PathVariable String numero, @RequestBody UpdateCartaoDTO updateDTO) {
         Cartao entity = cartaoService.update(numero, updateDTO.getAtivo());
-        return ResponseEntity.ok(cartaoMapper.toDTO(entity));
+        return cartaoMapper.toDTO(entity);
+    }
+
+    @PatchMapping("/id/{id}")
+    public CartaoDTO update(@PathVariable Integer id, @RequestBody UpdateCartaoDTO updateDTO) {
+        Cartao entity = cartaoService.update(id, updateDTO.getAtivo());
+        return cartaoMapper.toDTO(entity);
     }
 
     @GetMapping("/{numero}")
-    public ResponseEntity<CartaoDTO> findByNumero(@PathVariable String numero) {
+    public CartaoDTO findByNumero(@PathVariable String numero) {
         Cartao entity = cartaoService.findByNumero(numero);
-        return ResponseEntity.ok(cartaoMapper.toDTO(entity));
+        return cartaoMapper.toDTO(entity);
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<CartaoDTO> findById(@PathVariable Integer id) {
+    public CartaoDTO findById(@PathVariable Integer id) {
         Cartao entity = cartaoService.findById(id);
-        return ResponseEntity.ok(cartaoMapper.toDTO(entity));
+        return cartaoMapper.toDTO(entity);
     }
 }

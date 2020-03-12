@@ -3,6 +3,7 @@ package br.com.rr.mastertech.cartao.service;
 import br.com.rr.mastertech.cartao.client.ClienteClient;
 import br.com.rr.mastertech.cartao.client.dto.ClienteDTO;
 import br.com.rr.mastertech.cartao.domain.Cartao;
+import br.com.rr.mastertech.cartao.exception.CartaoNaoEncontradoException;
 import br.com.rr.mastertech.cartao.exception.ClienteNaoEncontradoException;
 import br.com.rr.mastertech.cartao.repository.CartaoRepository;
 import feign.FeignException;
@@ -32,15 +33,14 @@ public class CartaoService {
         }
     }
 
+    public Cartao update(Integer id, Boolean ativo) {
+        Optional<Cartao> optionalCartao = this.cartaoRepository.findById(id);
+        return update(ativo, optionalCartao);
+    }
+
     public Cartao update(String numero, Boolean ativo) {
         Optional<Cartao> optionalCartao = this.cartaoRepository.findByNumero(numero);
-        if(!optionalCartao.isPresent()) {
-            throw new EntityNotFoundException();
-        }
-
-        Cartao entity = optionalCartao.get();
-        entity.setAtivo(ativo);
-        return cartaoRepository.save(entity);
+        return update(ativo, optionalCartao);
     }
 
     public Cartao findById(Integer id) {
@@ -59,5 +59,15 @@ public class CartaoService {
         }
 
         return optionalCartao.get();
+    }
+
+    private Cartao update(Boolean ativo, Optional<Cartao> optionalCartao) {
+        if (!optionalCartao.isPresent()) {
+            throw new CartaoNaoEncontradoException();
+        }
+
+        Cartao entity = optionalCartao.get();
+        entity.setAtivo(ativo);
+        return cartaoRepository.save(entity);
     }
 }

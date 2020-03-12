@@ -21,9 +21,12 @@ public class Cartao {
     @GeneratedValue
     private Integer id;
 
+    @Column(unique = true, nullable = false)
     private String numero;
+
+    @Column(columnDefinition = "boolean default false")
     private Boolean ativo;
 
-    @Column(name = "ID_CLIENTE")
+    @Column(name = "ID_CLIENTE", nullable = false)
     private Integer clienteId;
 }

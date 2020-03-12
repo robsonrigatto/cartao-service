@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/cartao")
 public class CartaoController {
@@ -22,19 +24,19 @@ public class CartaoController {
     private CartaoMapper cartaoMapper;
 
     @PostMapping
-    public ResponseEntity<CartaoDTO> create(@RequestBody CreateCartaoDTO createDTO) {
+    public ResponseEntity<CartaoDTO> create(@Valid @RequestBody CreateCartaoDTO createDTO) {
         Cartao entity = cartaoService.create(createDTO.getNumero(), createDTO.getClienteId());
         return new ResponseEntity(cartaoMapper.toDTO(entity), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{numero}")
-    public CartaoDTO update(@PathVariable String numero, @RequestBody UpdateCartaoDTO updateDTO) {
+    public CartaoDTO update(@PathVariable String numero, @Valid @RequestBody UpdateCartaoDTO updateDTO) {
         Cartao entity = cartaoService.update(numero, updateDTO.getAtivo());
         return cartaoMapper.toDTO(entity);
     }
 
     @PatchMapping("/id/{id}")
-    public CartaoDTO update(@PathVariable Integer id, @RequestBody UpdateCartaoDTO updateDTO) {
+    public CartaoDTO update(@PathVariable Integer id, @Valid @RequestBody UpdateCartaoDTO updateDTO) {
         Cartao entity = cartaoService.update(id, updateDTO.getAtivo());
         return cartaoMapper.toDTO(entity);
     }

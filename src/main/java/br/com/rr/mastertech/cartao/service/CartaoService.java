@@ -10,7 +10,6 @@ import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @Service
@@ -46,7 +45,7 @@ public class CartaoService {
     public Cartao findById(Integer id) {
         Optional<Cartao> optionalCartao = this.cartaoRepository.findById(id);
         if(!optionalCartao.isPresent()) {
-            throw new EntityNotFoundException();
+            throw new CartaoNaoEncontradoException();
         }
 
         return optionalCartao.get();
@@ -55,7 +54,7 @@ public class CartaoService {
     public Cartao findByNumero(String numero) {
         Optional<Cartao> optionalCartao = this.cartaoRepository.findByNumero(numero);
         if(!optionalCartao.isPresent()) {
-            throw new EntityNotFoundException();
+            throw new CartaoNaoEncontradoException();
         }
 
         return optionalCartao.get();

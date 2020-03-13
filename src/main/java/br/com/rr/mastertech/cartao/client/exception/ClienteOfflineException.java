@@ -1,4 +1,4 @@
-package br.com.rr.mastertech.cartao.exception;
+package br.com.rr.mastertech.cartao.client.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

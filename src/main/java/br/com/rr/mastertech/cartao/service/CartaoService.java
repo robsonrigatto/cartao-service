@@ -2,12 +2,17 @@ package br.com.rr.mastertech.cartao.service;
 
 import br.com.rr.mastertech.cartao.client.ClienteClient;
 import br.com.rr.mastertech.cartao.client.dto.ClienteDTO;
+import br.com.rr.mastertech.cartao.client.exception.ClienteErroInesperadoException;
+import br.com.rr.mastertech.cartao.client.exception.ClienteOfflineException;
 import br.com.rr.mastertech.cartao.domain.Cartao;
 import br.com.rr.mastertech.cartao.exception.CartaoNaoEncontradoException;
 import br.com.rr.mastertech.cartao.exception.ClienteNaoEncontradoException;
+import br.com.rr.mastertech.cartao.exception.NumeroCartaoDuplicadoException;
 import br.com.rr.mastertech.cartao.repository.CartaoRepository;
+import com.netflix.hystrix.exception.HystrixRuntimeException;
 import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,8 +32,14 @@ public class CartaoService {
             Cartao cartao = Cartao.builder().numero(numero).clienteId(clienteDTO.getId()).ativo(false).build();
             return this.cartaoRepository.save(cartao);
 
-        } catch (FeignException.FeignClientException.NotFound ex) {
-            throw new ClienteNaoEncontradoException();
+        } catch (HystrixRuntimeException ex) {
+            if(ex.getCause() instanceof FeignException.NotFound) {
+                throw new ClienteNaoEncontradoException();
+            }
+            throw new ClienteOfflineException();
+
+        } catch (DataIntegrityViolationException ex) {
+            throw new NumeroCartaoDuplicadoException();
         }
     }
 

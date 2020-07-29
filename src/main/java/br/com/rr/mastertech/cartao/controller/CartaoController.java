@@ -26,30 +26,30 @@ public class CartaoController {
     @PostMapping
     public ResponseEntity<CartaoDTO> create(@Valid @RequestBody CreateCartaoDTO createDTO) {
         Cartao entity = cartaoService.create(createDTO.getNumero(), createDTO.getClienteId());
-        return new ResponseEntity(cartaoMapper.toDTO(entity), HttpStatus.CREATED);
+        return new ResponseEntity(cartaoMapper.toCartaoDTO(entity), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{numero}")
     public CartaoDTO update(@PathVariable String numero, @Valid @RequestBody UpdateCartaoDTO updateDTO) {
         Cartao entity = cartaoService.update(numero, updateDTO.getAtivo());
-        return cartaoMapper.toDTO(entity);
+        return cartaoMapper.toCartaoDTO(entity);
     }
 
     @PatchMapping("/id/{id}")
     public CartaoDTO update(@PathVariable Integer id, @Valid @RequestBody UpdateCartaoDTO updateDTO) {
         Cartao entity = cartaoService.update(id, updateDTO.getAtivo());
-        return cartaoMapper.toDTO(entity);
+        return cartaoMapper.toCartaoDTO(entity);
     }
 
     @GetMapping("/{numero}")
     public CartaoDTO findByNumero(@PathVariable String numero) {
         Cartao entity = cartaoService.findByNumero(numero);
-        return cartaoMapper.toDTO(entity);
+        return cartaoMapper.toCartaoDTO(entity);
     }
 
     @GetMapping("/id/{id}")
     public CartaoDTO findById(@PathVariable Integer id) {
         Cartao entity = cartaoService.findById(id);
-        return cartaoMapper.toDTO(entity);
+        return cartaoMapper.toCartaoDTO(entity);
     }
 }
